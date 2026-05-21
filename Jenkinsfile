@@ -48,7 +48,7 @@ pipeline {
             steps {
                 echo 'Deploying to Kubernetes cluster...'
                 sh '''
-                    sed -i 's|<dockerhub-username>/capstone-website:latest|kaushal2608/capstone-website:latest|g' deployment.yml
+                    // sed -i 's|<dockerhub-username>/capstone-website:latest|kaushal2608/capstone-website:latest|g' deployment.yml
 
                     kubectl apply -f deployment.yml
                     kubectl apply -f service.yml
