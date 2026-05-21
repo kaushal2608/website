@@ -12,16 +12,22 @@ pipeline {
 
         stage('Git Clone') {
             steps {
-                echo 'Cloning GitHub repository...'
-                git branch: 'master',
-                    credentialsId: 'github-credentials',
-                    url: "${GITHUB_REPO}"
+                echo 'Cloning latest GitHub code...'
+                deleteDir()
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/master']],
+                    userRemoteConfigs: [[
+                        url: "${GITHUB_REPO}",
+                        credentialsId: 'github-credentials'
+                    ]]
+                ])
             }
         }
 
         stage('Docker Build') {
             steps {
-                echo 'Building Docker image...'
+                echo 'Building fresh Docker image...'
                 sh '''
                     docker build --no-cache -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
@@ -48,12 +54,12 @@ pipeline {
             steps {
                 echo 'Deploying to Kubernetes cluster...'
                 sh '''
-                    sed -i 's|<dockerhub-username>/capstone-website:latest|kaushal2608/capstone-website:latest|g' deployment.yml
-
                     kubectl apply -f deployment.yml
                     kubectl apply -f service.yml
 
+                    kubectl rollout restart deployment capstone-website
                     kubectl rollout status deployment/capstone-website --timeout=300s
+
                     kubectl get pods
                     kubectl get svc capstone-website-service
                 '''
@@ -64,7 +70,7 @@ pipeline {
     post {
         success {
             echo 'Pipeline completed successfully!'
-            echo 'Website deployed at http://54.234.75.50:30008'
+            echo 'Website deployed successfully!'
         }
 
         failure {
