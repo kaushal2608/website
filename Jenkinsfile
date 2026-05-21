@@ -23,7 +23,7 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 sh '''
-                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    docker build --no-cache -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
