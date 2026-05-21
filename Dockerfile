@@ -1,9 +1,5 @@
-FROM ubuntu
-
-RUN apt-get update && \
-    apt-get install -y apache2 && \
-    apt-get clean
-
-COPY index.html /var/www/html/
-
-CMD ["apachectl", "-D", "FOREGROUND"]
+FROM ubuntu/apache2:latest
+LABEL maintainer="capstone-project"
+COPY . /var/www/html/
+EXPOSE 80
+CMD ["apache2ctl", "-D", "FOREGROUND"]
